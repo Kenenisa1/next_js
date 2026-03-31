@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+  :root {
+    /* Pure dark theme defaults */
+    --background: 0 0% 0%;         /* Pure Black #000000 */
+    --foreground: 210 40% 98%;     /* Almost White */
+    
+    --card: 0 0% 3%;               /* Slightly lighter than background */
+    --card-foreground: 210 40% 98%;
+    
+    --primary: 210 100% 50%;       /* Vibrant Blue for links/buttons */
+    --primary-foreground: 0 0% 100%;
+    
+    --muted: 215 25% 15%;          /* Dark Grey for secondary text backgrounds */
+    --muted-foreground: 215 20% 65%;
+    
+    --accent: 210 100% 50%;        /* Electric Blue accent */
+    --accent-foreground: 210 40% 98%;
+
+    --border: 215 25% 12%;         /* Subtle borders for cards */
+    --input: 215 25% 12%;
+    --ring: 210 100% 50%;
+  }
+
+  body {
+    /* Smooth gradient fallback for depth */
+    background-image: radial-gradient(at 0% 0%, hsla(210, 100%, 10%, 0.15) 0, transparent 50%), 
+                      radial-gradient(at 100% 0%, hsla(210, 100%, 10%, 0.15) 0, transparent 50%);
+    min-height: 100vh;
+  }
