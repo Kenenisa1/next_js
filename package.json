@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "cloudinary": "^2.9.0",
+    "mongodb": "^7.1.1",
+    "mongoose": "^9.4.1",
     "next": "16.2.1",
     "posthog-js": "^1.364.6",
     "react": "19.2.4",
