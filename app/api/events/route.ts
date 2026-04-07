@@ -61,10 +61,11 @@ export async function GET() {
             }
         )
     }
-    
+
     catch(e) {
         return NextResponse.json({message: 'Failed to fetch events from database', error: e instanceof Error? e.message: 'unknown'},
             {status: 500}
         )
     }
 }
+
