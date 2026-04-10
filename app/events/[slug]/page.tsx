@@ -8,6 +8,9 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import BookEvent from "@/components/BookEvent";
+import { getSimilarEventsBySlug } from "@/lib/actions/event.actions";
+import EventCard from "@/components/EventCard";
+import { IEvent } from "@/database/event.model";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -67,22 +70,25 @@ const EventDetailsPage = async ({
     organizer,
     tags,
   } = data.event;
-  const bookings = 12; // Example count
+  const bookings = 10;
+  const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
+  // Example count
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-24 pt-24 sm:pt-28">
       {/* Hero Header */}
-      <div className="relative h-[40vh] md:h-[50vh] w-full pt-20">
+      <div className="relative h-[42vh] md:h-[52vh] w-full overflow-hidden rounded-b-[3rem] shadow-2xl shadow-black/50">
         <Image
           src={image}
           alt={slug}
           fill
-          className="object-cover opacity-60"
+          className="object-cover opacity-70"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_30%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/40 to-transparent" />
         <div className="absolute bottom-0 left-0 w-full max-w-7xl mx-auto px-6 pb-10">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 tracking-tight max-w-4xl">
             {description}
           </h1>
           <div className="flex flex-wrap gap-6 text-sm md:text-base text-zinc-300">
@@ -109,16 +115,16 @@ const EventDetailsPage = async ({
             </p>
           </section>
 
-          <EventAgenda agenda={JSON.parse(agenda[0])} />
+          <EventAgenda agenda={agenda} />
 
-          <section className="p-8 rounded-2xl bg-gradient-to-br from-card to-zinc-900 border border-border">
+          <section className="p-8 rounded-2xl bg-linear-to-br from-card to-zinc-900 border border-border">
             <h2 className="text-xl font-bold text-white mb-3">
               About the Organizer
             </h2>
             <p className="text-muted-foreground leading-relaxed">{organizer}</p>
           </section>
 
-          <EventTags tags={JSON.parse(tags[0])} />
+          <EventTags tags={tags} />
         </div>
 
         {/* RIGHT SIDE: Booking Sidebar */}
@@ -159,6 +165,18 @@ const EventDetailsPage = async ({
           </div>
         </aside>
       </main>
+      <section className="max-w-7xl mx-auto px-6 mt-20">
+        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-2">
+          <div className="w-1 h-8 bg-primary rounded-full" /> Similar Events
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {similarEvents
+            .filter((event) => event.image?.trim() && event.title?.trim())
+            .map((event: IEvent) => (
+              <EventCard key={event.slug} {...event} />
+            ))}
+        </div>
+      </section>
     </div>
   );
 };
