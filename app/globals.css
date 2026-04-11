@@ -1,30 +1,76 @@
 @import "tailwindcss";
 
-  :root {
-    /* Pure dark theme defaults */
-    --background: 0 0% 0%;         /* Pure Black #000000 */
-    --foreground: 210 40% 98%;     /* Almost White */
-    
-    --card: 0 0% 3%;               /* Slightly lighter than background */
-    --card-foreground: 210 40% 98%;
-    
-    --primary: 210 100% 50%;       /* Vibrant Blue for links/buttons */
-    --primary-foreground: 0 0% 100%;
-    
-    --muted: 215 25% 15%;          /* Dark Grey for secondary text backgrounds */
-    --muted-foreground: 215 20% 65%;
-    
-    --accent: 210 100% 50%;        /* Electric Blue accent */
-    --accent-foreground: 210 40% 98%;
+@theme {
+  /* This connects your CSS variables to Tailwind utility classes */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  /* ... add others as needed */
+}
 
-    --border: 215 25% 12%;         /* Subtle borders for cards */
-    --input: 215 25% 12%;
-    --ring: 210 100% 50%;
-  }
+:root {
+  /* Background: true OLED black for maximum contrast */
+  --background: 240 4% 1%;
+  --foreground: 0 0% 98%;
 
-  body {
-    /* Smooth gradient fallback for depth */
-    background-image: radial-gradient(at 0% 0%, hsla(210, 100%, 10%, 0.15) 0, transparent 50%), 
-                      radial-gradient(at 100% 0%, hsla(210, 100%, 10%, 0.15) 0, transparent 50%);
-    min-height: 100vh;
-  }
+  /* Cards: darker surface with crisp contrast */
+  --card: 240 8% 3%;
+  --card-foreground: 0 0% 98%;
+
+  /* Primary: rich indigo for polished accents */
+  --primary: 244 82% 62%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Borders: very subtle, high-end glow feel */
+  --border: 240 6% 14%;
+
+  /* Muted: For secondary text (location, date) */
+  --muted-foreground: 240 5% 65%;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  /* Added 'fixed' to keep the glow in place while scrolling */
+  background-image:
+    radial-gradient(
+      at 10% 10%,
+      hsla(199, 100%, 68%, 0.16) 0px,
+      transparent 24%
+    ),
+    radial-gradient(
+      at 90% 10%,
+      hsla(280, 100%, 70%, 0.12) 0px,
+      transparent 20%
+    ),
+    radial-gradient(
+      at 50% 100%,
+      hsla(230, 80%, 18%, 0.14) 0px,
+      transparent 28%
+    ),
+    linear-gradient(180deg, rgba(3, 6, 16, 0.96), rgba(4, 6, 15, 0.98));
+  background-attachment: fixed;
+  font-feature-settings:
+    "cv11", "ss01"; /* Improves legibility for sans fonts */
+}
+
+html {
+  background: #020204;
+}
+
+* {
+  scrollbar-color: rgba(148, 163, 184, 0.32) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+}
