@@ -1,20 +1,37 @@
 "use client";
+import { createBooking } from "@/lib/actions/booking.action";
+import posthog from "posthog-js";
 import { useState } from "react";
-import { FaEnvelope, FaCheck } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 
-const BookEvent = () => {
+const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    setTimeout(() => {
-      setSubmitted(true);
+    try {
+      const response = await createBooking({ eventId, slug, email });
+      if (response?.success) {
+        setSubmitted(true);
+        posthog.capture("event_booked successfully", {
+          eventId,
+          slug,
+          email,
+        });
+      } else {
+        console.error("Booking creation failed");
+        posthog.captureException("booking failed");
+      }
+    } catch (er) {
+      console.error("An error occurred while creating booking", er);
+      posthog.captureException(er, { context: "booking creation error" });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
+
   };
 
   return (
@@ -37,7 +54,7 @@ const BookEvent = () => {
           <div className="space-y-2">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-white flex items-center gap-2"
+              className="flex text-sm font-medium text-white items-center gap-2"
             >
               Email Address
             </label>
@@ -65,9 +82,7 @@ const BookEvent = () => {
                 Processing...
               </>
             ) : (
-              <>
-                Book My Spot
-              </>
+              <>Book My Spot</>
             )}
           </button>
         </form>
