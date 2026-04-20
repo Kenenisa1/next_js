@@ -1,76 +1,66 @@
 @import "tailwindcss";
 
+/* 1. GLOBAL KEYFRAMES (Keep these outside @theme for browser-wide access) */
+@keyframes aurora {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-10%, 15%) scale(1.1); }
+  66% { transform: translate(15%, -10%) scale(0.9); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.01); }
+}
+
 @theme {
-  /* This connects your CSS variables to Tailwind utility classes */
+  /* 2. Define Brand Colors */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  --color-primary: hsl(var(--primary));
-  /* ... add others as needed */
+  --color-primary: #0ea5e9;    /* Sky Blue for Hawassa */
+  --color-secondary: #6366f1;  /* Indigo for depth */
+  --color-border: hsl(var(--border));
+  --color-card: hsl(var(--card));
+
+  /* 3. Register Utility Classes */
+  --animate-aurora: aurora 25s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
 }
 
 :root {
-  /* Background: true OLED black for maximum contrast */
   --background: 240 4% 1%;
   --foreground: 0 0% 98%;
-
-  /* Cards: darker surface with crisp contrast */
   --card: 240 8% 3%;
   --card-foreground: 0 0% 98%;
-
-  /* Primary: rich indigo for polished accents */
   --primary: 244 82% 62%;
-  --primary-foreground: 0 0% 100%;
-
-  /* Borders: very subtle, high-end glow feel */
   --border: 240 6% 14%;
-
-  /* Muted: For secondary text (location, date) */
   --muted-foreground: 240 5% 65%;
 }
 
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  /* Added 'fixed' to keep the glow in place while scrolling */
+  /* Premium Mesh Gradient for Hawassa Pulse */
   background-image:
-    radial-gradient(
-      at 10% 10%,
-      hsla(199, 100%, 68%, 0.16) 0px,
-      transparent 24%
-    ),
-    radial-gradient(
-      at 90% 10%,
-      hsla(280, 100%, 70%, 0.12) 0px,
-      transparent 20%
-    ),
-    radial-gradient(
-      at 50% 100%,
-      hsla(230, 80%, 18%, 0.14) 0px,
-      transparent 28%
-    ),
-    linear-gradient(180deg, rgba(3, 6, 16, 0.96), rgba(4, 6, 15, 0.98));
+    radial-gradient(at 10% 10%, hsla(199, 100%, 68%, 0.1) 0px, transparent 35%),
+    radial-gradient(at 90% 10%, hsla(280, 100%, 70%, 0.08) 0px, transparent 30%),
+    radial-gradient(at 50% 100%, hsla(230, 80%, 18%, 0.12) 0px, transparent 40%);
   background-attachment: fixed;
-  font-feature-settings:
-    "cv11", "ss01"; /* Improves legibility for sans fonts */
+  font-feature-settings: "cv11", "ss01";
 }
 
 html {
   background: #020204;
+  scroll-behavior: smooth;
 }
 
-* {
-  scrollbar-color: rgba(148, 163, 184, 0.32) transparent;
-}
-
+/* Custom Scrollbar */
 *::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
 }
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 *::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.28);
-  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.3);
 }
