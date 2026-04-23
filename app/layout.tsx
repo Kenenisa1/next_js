@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AdminDashboard from "@/app/admin/page";
 import { PHProvider } from "./providers";
 import { Suspense } from "react";
 
@@ -57,6 +58,7 @@ export default function RootLayout({
           </div>
         }>
         <PHProvider>
+          {!AdminDashboard && <Navbar />}
           <Navbar/>
           {children}
           <Footer/>
