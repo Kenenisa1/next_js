@@ -6,14 +6,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'res.cloudinary.com'
+        hostname: 'res.cloudinary.com',
+        pathname: '/**', 
       }
     ]
   },
-  experimental : {
+  experimental: {
     turbopackFileSystemCacheForDev: true
   }
-  
 };
 
 export default nextConfig;
