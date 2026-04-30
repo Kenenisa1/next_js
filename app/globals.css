@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 /* 1. GLOBAL KEYFRAMES (Keep these outside @theme for browser-wide access) */
 @keyframes aurora {
   0%, 100% { transform: translate(0, 0) scale(1); }
