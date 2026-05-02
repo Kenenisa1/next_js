@@ -1,57 +1,59 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import  connectToDatabase  from "@/lib/mongodb";
+import connectToDatabase from "@/lib/mongodb";
 import User from "@/database/user.model";
 
 /**
  * CREATE USER
- * Triggered after a successful sign-up to sync auth data with MongoDB.
+ * Native MERN implementation for custom registration.
  */
 export async function createUser(userData: {
-  clerkId: string;
   name: string;
   username: string;
   email: string;
   picture: string;
+  password?: string; // For your custom auth
 }) {
   try {
     await connectToDatabase();
-
+    
     const newUser = await User.create(userData);
-
     return JSON.parse(JSON.stringify(newUser));
   } catch (error) {
     console.error("Error creating user:", error);
-    throw error;
+    throw new Error("Failed to initiate user profile.");
   }
 }
 
 /**
  * UPDATE USER
- * Keeps the database in sync if the user changes their profile on the auth provider.
+ * Uses MongoDB _id for maximum query efficiency.
  */
 export async function updateUser(params: {
-  clerkId: string;
+  userId: string;
   updateData: Partial<{
     name: string;
     username: string;
     email: string;
     picture: string;
+    bio: string;
+    location: string;
   }>;
   path: string;
 }) {
   try {
     await connectToDatabase();
+    const { userId, updateData, path } = params;
 
-    const { clerkId, updateData, path } = params;
-
-    await User.findOneAndUpdate({ clerkId }, updateData, {
-      new: true,
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { 
+      new: true 
     });
 
-    // Refresh the cache for the profile page to show updated data
+    if (!updatedUser) throw new Error("User sequence not found.");
+
     revalidatePath(path);
+    return JSON.parse(JSON.stringify(updatedUser));
   } catch (error) {
     console.error("Error updating user:", error);
     throw error;
@@ -60,24 +62,66 @@ export async function updateUser(params: {
 
 /**
  * DELETE USER
- * Removes user data if they delete their account.
+ * Clean removal using the primary ID.
  */
-export async function deleteUser(clerkId: string) {
+export async function deleteUser(userId: string) {
   try {
     await connectToDatabase();
 
-    const user = await User.findOneAndDelete({ clerkId });
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) throw new Error("User not found in the grid.");
 
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // Optional: Delete user's associated events or bookings here
-    // await Event.deleteMany({ author: user._id });
-
+    // Note: You can add logic here to remove the user's bookings too
     return JSON.parse(JSON.stringify(user));
   } catch (error) {
     console.error("Error deleting user:", error);
     throw error;
+  }
+}
+
+/**
+ * TOGGLE SAVE EVENT
+ * Optimized to perform the existence check and update in a lean sequence.
+ */
+export async function toggleSaveEvent(params: {
+  userId: string;
+  eventId: string;
+  path: string;
+}) {
+  try {
+    await connectToDatabase();
+    const { userId, eventId, path } = params;
+
+    // Fetch only the 'saved' array to minimize data transfer
+    const user = await User.findById(userId).select("saved");
+    if (!user) throw new Error("User not found.");
+
+    const isSaved = user.saved.includes(eventId as any);
+
+    // Atomic operation: $pull (remove) or $addToSet (add if unique)
+    const update = isSaved 
+      ? { $pull: { saved: eventId } } 
+      : { $addToSet: { saved: eventId } };
+
+    await User.findByIdAndUpdate(userId, update);
+
+    revalidatePath(path);
+    return { status: isSaved ? "removed" : "added" };
+  } catch (error) {
+    console.error("Toggle save error:", error);
+    throw new Error("Failed to sync operation.");
+  }
+}
+
+/**
+ * UPDATE REPUTATION
+ * Atomic increment: the most efficient way to update counters.
+ */
+export async function updateReputation(userId: string, points: number) {
+  try {
+    await connectToDatabase();
+    await User.findByIdAndUpdate(userId, { $inc: { reputation: points } });
+  } catch (error) {
+    console.error("Reputation sync error:", error);
   }
 }
