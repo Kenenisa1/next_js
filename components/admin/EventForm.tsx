@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createEvent, updateEvent } from "@/lib/actions/event.actions";
+import { useRouter } from "next/navigation";
 import {
   MdOutlinePhotoSizeSelectActual,
   MdCheckCircle,
@@ -11,6 +12,7 @@ import {
   MdErrorOutline,
   MdClose,
   MdLabelOutline,
+  MdArrowBack,
   MdListAlt,
 } from "react-icons/md";
 import Image from "next/image";
@@ -84,6 +86,7 @@ const EventForm = ({ initialData, type }: EventFormProps) => {
     message: string;
     type: "success" | "error";
   } | null>(null);
+  const router = useRouter();
 
   // Controlled State to preserve data on error
   const [formState, setFormState] = useState({
@@ -208,6 +211,17 @@ const EventForm = ({ initialData, type }: EventFormProps) => {
 
   return (
     <div className="max-w-7xl mx-auto pb-32 px-6 relative text-zinc-300">
+
+      <button 
+    type="button"
+    onClick={() => router.back()}
+    className="group cursor-pointer mb-8 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 px-6 py-3 rounded-2xl transition-all active:scale-95"
+  >
+    <MdArrowBack className="text-sky-500 group-hover:-translate-x-1 transition-transform" size={20} />
+    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-white">
+      Back to admin
+    </span>
+  </button>
       {toast && (
         <div
           className={`fixed top-10 right-10 z-[100] flex items-center gap-4 px-6 py-4 rounded-2xl backdrop-blur-2xl border shadow-2xl ${
