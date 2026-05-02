@@ -25,11 +25,15 @@ export async function createEvent(formData: FormData): Promise<ActionResponse<IE
   try {
     await connectToDatabase();
 
-    // Helper to safely extract string values
-    const s = (key: string) => (formData.get(key) as string) || "";
+    const s = (key: string) => (formData.get(key) as string)?.trim() || "";
 
     const eventData = {
-      title: s('title'),
+      // 1. FIXED: Title must be an object { en, am, si } to match your schema
+      title: {
+        en: s('title_en'), // Changed from s('title')
+        am: s('title_am'),
+        si: s('title_si'),
+      },
       description: {
         en: s('desc_en'),
         am: s('desc_am'),
@@ -40,24 +44,39 @@ export async function createEvent(formData: FormData): Promise<ActionResponse<IE
         am: s('overview_am'),
         si: s('overview_si'),
       },
+      // 2. FIXED: Agenda must be an array of objects [{ en, am, si }]
+      // Map each line to the current active language (e.g., 'en')
+      agenda: s('agenda').split('\n')
+        .filter(Boolean)
+        .map(line => ({ en: line.trim() })), 
+
       hub: s('hub'),
       image: s('image'),
       venue: s('venue'),
       location: s('location'),
       date: s('date'),
       time: s('time'),
-      mode: s('mode') as 'online' | 'offline' | 'hybrid',
-      category: s('category') as 'Technology' | 'Culture' | 'Business' | 'Sports',
+      
+      // 3. ENUM HANDLING: Fallback to schema defaults if empty to avoid validation errors
+      mode: (s('mode') || "offline") as 'online' | 'offline' | 'hybrid',
+      category: (s('category') || "Technology") as 'Technology' | 'Culture' | 'Business' | 'Sports',
+      status: (s('status') || "draft") as 'draft' | 'published' | 'sold-out' | 'archived',
+      
       audience: s('audience'),
-      organizer: s('organizer'),
+      organizer: s('organizer') || "Kenenisa Mieso", // Default if missing
       price: Number(formData.get('price')) || 0,
+      totalCapacity: Number(formData.get('totalCapacity')) || 0,
       tags: s('tags').split(',').map(tag => tag.trim()).filter(Boolean),
-      agenda: s('agenda').split('\n').map(line => line.trim()).filter(Boolean),
+      isFeatured: formData.get('isFeatured') === 'true' || formData.get('isFeatured') === 'on',
     };
+
+    // Final Validation Check before DB hit
+    if (!eventData.title.en || !eventData.description.en) {
+      throw new Error("Primary Language (English) Title and Description are required.");
+    }
 
     const newEvent = await Event.create(eventData);
     
-    // Purge cache to reflect new data on the dashboard
     revalidatePath('/admin');
     
     return { 
@@ -67,7 +86,10 @@ export async function createEvent(formData: FormData): Promise<ActionResponse<IE
     };
   } catch (error: any) {
     console.error("[DATABASE ERROR] Creation failed:", error);
-    return { success: false, message: error.message || "Failed to create pulse" };
+    return { 
+      success: false, 
+      message: error.message || "Failed to create pulse" 
+    };
   }
 }
 
